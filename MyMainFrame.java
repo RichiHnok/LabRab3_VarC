@@ -3,11 +3,13 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
-import javax.swing.JMenuBar;
+// import javax.swing.JMenuBar;
 import javax.swing.JTextField;
+import javax.swing.plaf.DimensionUIResource;
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import java.awt.Dimension;
 
 public class MyMainFrame extends JFrame {
     public static void main(String[] args){
@@ -22,9 +24,6 @@ public class MyMainFrame extends JFrame {
         Double[] coeffs = new Double[coef.size()];
         coeffs = coef.toArray(coeffs);
 
-        // for(Double c : coeffs)
-        //     System.out.println(c + " ");
-
         MyMainFrame frame = new MyMainFrame(coeffs);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -35,15 +34,15 @@ public class MyMainFrame extends JFrame {
 
     private final int WIDTH = 700;
     private final int HEIGHT = 400;
-    private Double[] coeffs;
-
+    
+    // private Double[] coeffs;
     private JTextField fromField;
     private JTextField toField;
     private JTextField stepField;
 
     public MyMainFrame (Double[] coeffs){
         super("Табулирование многочлена на отрезке по схеме Гонрнера");
-        this.coeffs = coeffs;
+        // this.coeffs = coeffs;
         setSize(WIDTH, HEIGHT);
         Toolkit kit = Toolkit.getDefaultToolkit();
 
@@ -89,20 +88,39 @@ public class MyMainFrame extends JFrame {
 
         boxArguments.add(Box.createHorizontalGlue());
 
+        boxArguments.setPreferredSize(new Dimension(
+            Double.valueOf(boxArguments.getMaximumSize().getWidth()).intValue(),
+            Double.valueOf(boxArguments.getMinimumSize().getHeight()).intValue() * 2
+        ));
+
+        
+        //^ Область для таблицы
+        Box boxTable = Box.createHorizontalBox();
+        
+        
         //^ Область для кнопок вычисления и сброса
         Box boxCalculateClearButtons = Box.createHorizontalBox();
         boxCalculateClearButtons.add(Box.createHorizontalGlue());
-
+        
         boxCalculateClearButtons.add(calculateButton);
         boxCalculateClearButtons.add(Box.createHorizontalStrut(20));
         boxCalculateClearButtons.add(clearButton);
-
+        
         boxCalculateClearButtons.add(Box.createHorizontalGlue());
         
+        boxCalculateClearButtons.setPreferredSize(new DimensionUIResource(
+            Double.valueOf(boxCalculateClearButtons.getMaximumSize().getWidth()).intValue(), 
+            Double.valueOf(boxCalculateClearButtons.getMinimumSize().getHeight()).intValue() * 2
+        ));
+        
         //^ Конечная Компоновка
-        Box contentBox = Box.createVerticalBox();
-        contentBox.add(boxArguments);
-        contentBox.add(boxCalculateClearButtons);
-        getContentPane().add(contentBox, BorderLayout.CENTER);
+        getContentPane().add(boxArguments, BorderLayout.NORTH);
+        getContentPane().add(boxTable, BorderLayout.CENTER);
+        getContentPane().add(boxCalculateClearButtons, BorderLayout.SOUTH);
+        // Box contentBox = Box.createVerticalBox();
+        // contentBox.add(boxArguments);
+        // contentBox.add(boxTable);
+        // contentBox.add(boxCalculateClearButtons);
+        // getContentPane().add(contentBox, BorderLayout.CENTER);
     }
 }
