@@ -24,7 +24,8 @@ public class MyGornerTableModel extends AbstractTableModel{
         return step;
     }
     public int getColumnCount(){
-        return 2;
+        // return 2;
+        return 4;
     }
     public int getRowCount(){
         return Double.valueOf(Math.ceil((to - from)/step)).intValue() + 1;
@@ -34,8 +35,12 @@ public class MyGornerTableModel extends AbstractTableModel{
         switch(column){
             case 0:
                 return "Значение Х";
+            case 1:
+                return "Значение многочлена\nпри чтении коэффициентов\nс одного конца";
+            case 2:
+                return "Значение многочлена\nпри чтении коэффициентов\nс другого конца";
             default:
-                return "Значение многочлена";
+                return "Разница одного и другого";
         }
     }
 
@@ -45,15 +50,25 @@ public class MyGornerTableModel extends AbstractTableModel{
 
     public Object getValueAt(int row, int column){
         double x = from + step*row;
-        if(column == 0){
-            return x;
-        }else{
-            int len = coeffs.length;
-            double bn = coeffs[len - 1];
-            for(int i = len - 2; i >= 0 ; i--){
-                bn = coeffs[i] + bn * x;
-            }
-            return bn;
+        int len = coeffs.length;
+        double bn1 = coeffs[len -1];
+        for(int i = len - 2; i >= 0; i--){
+            bn1 = coeffs[i] + bn1 * x;
+        }
+
+        double bn2 = coeffs[0];
+        for(int i = 1; i < len; i++){
+            bn2 = coeffs[i] + bn2 * x;
+        }
+        switch(column){
+            case 0:
+                return x;
+            case 1:
+                return bn1;
+            case 2:
+                return bn2;
+            default:
+                return bn1 - bn2;
         }
     }        
 }

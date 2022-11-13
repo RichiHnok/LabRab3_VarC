@@ -27,6 +27,10 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
+import javax.swing.JDialog;
+import javax.swing.ImageIcon;
+import java.text.DecimalFormat;
+// import java.awt.Image;
 // import javax.swing.BorderFactory;
 public class MyMainFrame extends JFrame {
     public static void main(String[] args){
@@ -58,6 +62,7 @@ public class MyMainFrame extends JFrame {
     private JMenuItem saveToTextMenuItem;
     private JMenuItem saveToGraphicsMenuItem;
     private JMenuItem searchValueMenuItem;
+    private JMenuItem searchValuesFromIntervalMenuItem;
 
     private JTextField fromField;
     private JTextField toField;
@@ -76,10 +81,11 @@ public class MyMainFrame extends JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         
         setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
-        
-        //@ Реализация основного функционала
-        Box boxResult = Box.createHorizontalBox();
+
+        boxResult = Box.createHorizontalBox();
         boxResult.add(new JPanel());
+        
+    //@ Реализация основного функционала
         
         //^ Главное меню
         JMenuBar menuBar = new JMenuBar();
@@ -88,6 +94,8 @@ public class MyMainFrame extends JFrame {
         menuBar.add(fileMenu);
         JMenu tableMenu = new JMenu("Таблица");
         menuBar.add(tableMenu);
+        JMenu helpMenu = new JMenu("Справка");
+        menuBar.add(helpMenu);
         
         Action saveToTextAction = new AbstractAction("Сохранить в текстовый файл") {
             public void actionPerformed(ActionEvent event) {
@@ -115,7 +123,7 @@ public class MyMainFrame extends JFrame {
         };
         saveToGraphicsMenuItem = fileMenu.add(saveToGraphicsAction);
         saveToGraphicsMenuItem.setEnabled(false);
-    
+        //^ Задать искомое значение
         Action searchValueAction = new AbstractAction("Найти значение многочлена"){
             public void actionPerformed(ActionEvent event){
                 String value = JOptionPane.showInputDialog(
@@ -124,12 +132,52 @@ public class MyMainFrame extends JFrame {
                     "Поиск значения",
                     JOptionPane.QUESTION_MESSAGE
                 );
-                 renderer.setNeedle(value);
-                 getContentPane().repaint();
+                    
+                renderer.setNeedle(value);
+                renderer.clearNeedles();
+                getContentPane().repaint();
             }
         };
         searchValueMenuItem = tableMenu.add(searchValueAction);
         searchValueMenuItem.setEnabled(false);
+
+        Action searchValuesFromInterval = new AbstractAction("Найти значения из промежутка"){
+            public void actionPerformed(ActionEvent event){
+                JOptionPaneN p = new JOptionPaneN(data, renderer, getContentPane());
+                // renderer.setNeedle("1.1");
+                p.setSize(500, 100);
+                // System.out.println(renderer.getNeedle());
+                // getContentPane().repaint();
+            }
+        };
+        searchValuesFromIntervalMenuItem = tableMenu.add(searchValuesFromInterval);
+        searchValuesFromIntervalMenuItem.setEnabled(false);
+        Action aboutProgram = new AbstractAction("Об авторе"){
+            public void actionPerformed(ActionEvent event){
+                JDialog helpWindow = new JDialog(MyMainFrame.this, "Информация");
+                helpWindow.setLocation((kit.getScreenSize().width - 300)/2, (kit.getScreenSize().height - 120)/2);
+                
+                JLabel  info = new JLabel("Вязовский Артемий, 9 группа");
+                
+                JLabel image = new JLabel();
+                ImageIcon photo = new ImageIcon("фото.png");
+                image.setIcon(photo);
+                
+                Box box = Box.createHorizontalBox();
+                box.add(Box.createHorizontalGlue());
+                box.add(info);
+                box.add(Box.createHorizontalStrut(5));
+                box.add(image);
+                box.add(Box.createHorizontalGlue());
+                
+                
+                helpWindow.setSize(300,120);
+                helpWindow.add(box);
+                helpWindow.setVisible(true);
+            }
+        };
+        JMenuItem helpMenuItem = helpMenu.add(aboutProgram);
+        helpMenuItem.setEnabled(true);
     
         //^ Текстовые поля для начала, конца интервала и шага табулирования
         fromField = new JTextField("0", 10);
@@ -162,6 +210,7 @@ public class MyMainFrame extends JFrame {
                     saveToTextMenuItem.setEnabled(true);
                     saveToGraphicsMenuItem.setEnabled(true);
                     searchValueMenuItem.setEnabled(true);
+                    searchValuesFromIntervalMenuItem.setEnabled(true);
 
                 }catch(NumberFormatException ex){
                     JOptionPane.showMessageDialog(
@@ -188,6 +237,7 @@ public class MyMainFrame extends JFrame {
                 saveToTextMenuItem.setEnabled(false);
                 saveToGraphicsMenuItem.setEnabled(false);
                 searchValueMenuItem.setEnabled(false);
+                searchValuesFromIntervalMenuItem.setEnabled(false);
 
                 getContentPane().validate();
             }            
@@ -257,21 +307,22 @@ public class MyMainFrame extends JFrame {
     }
 
     protected void saveToTextFile(File selectedFile){
+        DecimalFormat dF = new DecimalFormat("#.#####");
         try{
             PrintStream out = new PrintStream(selectedFile);
             out.println("Результаты табулирования многочлена по схеме Горнера");
             out.print("Многочлен: ");
             for(int i = 0; i < coeffs.length; i++){
-                out.print(coeffs[i] + "x^" + (coeffs.length - i - 1));
+                out.print(dF.format(coeffs[i]) + "x^" + (coeffs.length - i - 1));
                 if(i != coeffs.length - 1)
                     out.print(" + ");
             }
             out.println("");
-            out.println("Интервал от " + data.getFrom() + " до " + data.getTo() + " с шагом " + data.getStep());
+            out.println("Интервал от " + dF.format(data.getFrom()) + " до " + dF.format(data.getTo()) + " с шагом " + dF.format(data.getStep()));
             out.println("===================================================");
 
             for(int i = 0; i < data.getRowCount(); i++){
-                out.println("Значение в точке " + data.getValueAt(i, 0) + " равно " + data.getValueAt(i, 1));
+                out.println("Значение в точке " + dF.format(data.getValueAt(i, 0)) + " равно " + dF.format(data.getValueAt(i, 1)));
             }
             out.close();
         }catch(FileNotFoundException ex){}
