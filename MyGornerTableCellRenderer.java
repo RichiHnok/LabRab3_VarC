@@ -20,21 +20,19 @@ public class MyGornerTableCellRenderer implements TableCellRenderer {
 
 
     public MyGornerTableCellRenderer(){
-        panel.add(label);
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
         formatter.setMaximumFractionDigits(5);
         formatter.setGroupingUsed(false);
         DecimalFormatSymbols dottedDouble = formatter.getDecimalFormatSymbols();
         dottedDouble.setDecimalSeparator('.');
         formatter.setDecimalFormatSymbols(dottedDouble);
+        panel.add(label);
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
     }    
     
     public void setNeedle(String needle){
         this.needle = needle;
     }    
     
-    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
         String formattedDouble = formatter.format(value);
 
