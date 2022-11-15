@@ -36,11 +36,11 @@ public class MyGornerTableModel extends AbstractTableModel{
             case 0:
                 return "Значение Х";
             case 1:
-                return "Значение многочлена\nпри чтении коэффициентов\nс одного конца";
+                return "Значение y1";
             case 2:
-                return "Значение многочлена\nпри чтении коэффициентов\nс другого конца";
+                return "Значение y2";
             default:
-                return "Разница одного и другого";
+                return "Разница y1 и y2";
         }
     }
 

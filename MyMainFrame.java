@@ -61,6 +61,7 @@ public class MyMainFrame extends JFrame {
 
     private JMenuItem saveToTextMenuItem;
     private JMenuItem saveToGraphicsMenuItem;
+    private JMenuItem saveToCSVFileMenuItem;
     private JMenuItem searchValueMenuItem;
     private JMenuItem searchValuesFromIntervalMenuItem;
 
@@ -97,6 +98,7 @@ public class MyMainFrame extends JFrame {
         JMenu helpMenu = new JMenu("Справка");
         menuBar.add(helpMenu);
         
+        //^ Сохранение в читабельном виде
         Action saveToTextAction = new AbstractAction("Сохранить в текстовый файл") {
             public void actionPerformed(ActionEvent event) {
                 if (fileChooser==null) {
@@ -109,7 +111,8 @@ public class MyMainFrame extends JFrame {
         };
         saveToTextMenuItem = fileMenu.add(saveToTextAction);
         saveToTextMenuItem.setEnabled(false);
-        
+
+        //^ Сохранение в двоичном формате 
         Action saveToGraphicsAction = new AbstractAction("Сохранить данные для построения графика"){
             public void actionPerformed(ActionEvent event){
                 if(fileChooser == null){
@@ -123,6 +126,22 @@ public class MyMainFrame extends JFrame {
         };
         saveToGraphicsMenuItem = fileMenu.add(saveToGraphicsAction);
         saveToGraphicsMenuItem.setEnabled(false);
+
+        //^ Сохранение данных для построения таблицы
+        Action saveToGrahicsAction = new AbstractAction("сохранить  в CSV формате"){
+            public void actionPerformed(ActionEvent event){
+                if(fileChooser == null){
+                    fileChooser = new JFileChooser();
+                    fileChooser.setCurrentDirectory(new File("."));
+                }
+                if(fileChooser.showSaveDialog(MyMainFrame.this) == JFileChooser.APPROVE_OPTION){
+                    saveToCSVFile(fileChooser.getSelectedFile(), renderer.getFormatter());
+                }
+            }
+        };
+        saveToCSVFileMenuItem = fileMenu.add(saveToGrahicsAction);
+        saveToGraphicsMenuItem.setEnabled(false);
+
         //^ Задать искомое значение
         Action searchValueAction = new AbstractAction("Найти значение многочлена"){
             public void actionPerformed(ActionEvent event){
@@ -144,10 +163,7 @@ public class MyMainFrame extends JFrame {
         Action searchValuesFromInterval = new AbstractAction("Найти значения из промежутка"){
             public void actionPerformed(ActionEvent event){
                 JOptionPaneN p = new JOptionPaneN(data, renderer, getContentPane());
-                // renderer.setNeedle("1.1");
                 p.setSize(500, 100);
-                // System.out.println(renderer.getNeedle());
-                // getContentPane().repaint();
             }
         };
         searchValuesFromIntervalMenuItem = tableMenu.add(searchValuesFromInterval);
@@ -209,6 +225,7 @@ public class MyMainFrame extends JFrame {
 
                     saveToTextMenuItem.setEnabled(true);
                     saveToGraphicsMenuItem.setEnabled(true);
+                    saveToCSVFileMenuItem.setEnabled(true);
                     searchValueMenuItem.setEnabled(true);
                     searchValuesFromIntervalMenuItem.setEnabled(true);
 
@@ -236,6 +253,7 @@ public class MyMainFrame extends JFrame {
 
                 saveToTextMenuItem.setEnabled(false);
                 saveToGraphicsMenuItem.setEnabled(false);
+                saveToCSVFileMenuItem.setEnabled(false);
                 searchValueMenuItem.setEnabled(false);
                 searchValuesFromIntervalMenuItem.setEnabled(false);
 
@@ -299,11 +317,6 @@ public class MyMainFrame extends JFrame {
         getContentPane().add(boxArguments, BorderLayout.NORTH);
         getContentPane().add(boxResult, BorderLayout.CENTER);
         getContentPane().add(boxCalculateClearButtons, BorderLayout.SOUTH);
-        // Box contentBox = Box.createVerticalBox();
-        // contentBox.add(boxArguments);
-        // contentBox.add(boxResult);
-        // contentBox.add(boxCalculateClearButtons);
-        // getContentPane().add(contentBox, BorderLayout.CENTER);
     }
 
     protected void saveToTextFile(File selectedFile){
@@ -332,8 +345,18 @@ public class MyMainFrame extends JFrame {
         try(DataOutputStream out = new DataOutputStream(new FileOutputStream(selectedFile))){
             for(int i = 0; i < data.getRowCount(); i++){
                 out.writeDouble((Double)data.getValueAt(i,0));
-                out.writeDouble((Double)data.getValueAt(i,0));
+                out.writeDouble((Double)data.getValueAt(i,2));
             }
         }catch(Exception ex){}
+    }
+
+    protected void saveToCSVFile(File selectedFile, DecimalFormat formatter){
+        try{
+            PrintStream out = new PrintStream(selectedFile);
+            for(int i = 0; i < data.getRowCount(); i++){
+                out.println(formatter.format(data.getValueAt(i, 0)) + ";" + formatter.format(data.getValueAt(i, 1)));
+            }
+            out.close();
+        }catch(FileNotFoundException ex){}
     }
 }
